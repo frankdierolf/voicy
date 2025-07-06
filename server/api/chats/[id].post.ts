@@ -14,10 +14,10 @@ export default defineEventHandler(async (event) => {
 
   const { id } = getRouterParams(event)
   // TODO: Use readValidatedBody
-  const { model, messages } = await readBody(event)
+  const { messages } = await readBody(event)
 
   const db = useDrizzle()
-  
+
   // Initialize OpenAI client
   const openai = createOpenAI({
     apiKey: useRuntimeConfig().openaiApiKey
@@ -51,12 +51,12 @@ export default defineEventHandler(async (event) => {
         }],
         maxTokens: 50
       })
-      
+
       let title = ''
       for await (const delta of titleResponse.textStream) {
         title += delta
       }
-      
+
       title = title.replace(/:/g, '').split('\n')[0]?.trim() || 'Untitled'
       setHeader(event, 'X-Chat-Title', title)
       await db.update(tables.chats).set({ title }).where(eq(tables.chats.id, id as string))
@@ -77,11 +77,11 @@ export default defineEventHandler(async (event) => {
 
   // Check if the user is asking about secure data (July 5th questions)
   const userQuestion = lastMessage.content.toLowerCase()
-  const isSecureDataQuestion = 
-    userQuestion.includes('july 5') ||
-    userQuestion.includes('what did i do') ||
-    userQuestion.includes('who did i meet') ||
-    userQuestion.includes('what was my schedule')
+  const isSecureDataQuestion
+    = userQuestion.includes('july 5')
+      || userQuestion.includes('what did i do')
+      || userQuestion.includes('who did i meet')
+      || userQuestion.includes('what was my schedule')
 
   if (isSecureDataQuestion) {
     // Return pre-built response with password form
@@ -105,8 +105,8 @@ Once you enter the correct password ("iamharald"), I'll show you your confidenti
     // Return the pre-built response as a stream
     return new Response(secureResponse, {
       headers: {
-        'Content-Type': 'text/plain',
-      },
+        'Content-Type': 'text/plain'
+      }
     })
   }
 

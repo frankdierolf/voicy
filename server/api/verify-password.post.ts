@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: 'Password verified successfully'
     }
-  } catch (error) {
+  } catch {
     throw createError({
       statusCode: 500,
       statusMessage: 'Password verification failed'

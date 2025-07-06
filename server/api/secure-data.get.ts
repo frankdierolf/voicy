@@ -1,48 +1,47 @@
-
 // Mock secure data for July 5th
 const SECURE_DATA = {
   activities: [
-    "9:00 AM - Started the day with morning yoga session",
-    "10:30 AM - Had a productive team meeting about Q3 planning", 
-    "12:00 PM - Lunch at Central Cafe with Sarah from Marketing",
-    "2:00 PM - Worked on the new product roadmap presentation",
-    "4:00 PM - 1:1 meeting with manager about career development",
-    "6:00 PM - Finished reviewing code for the authentication feature"
+    '9:00 AM - Started the day with morning yoga session',
+    '10:30 AM - Had a productive team meeting about Q3 planning',
+    '12:00 PM - Lunch at Central Cafe with Sarah from Marketing',
+    '2:00 PM - Worked on the new product roadmap presentation',
+    '4:00 PM - 1:1 meeting with manager about career development',
+    '6:00 PM - Finished reviewing code for the authentication feature'
   ],
   meetings: [
     {
-      time: "10:30 AM",
-      title: "Q3 Planning Team Meeting", 
-      attendees: ["John Smith", "Emily Chen", "Michael Rodriguez"],
-      location: "Conference Room B"
+      time: '10:30 AM',
+      title: 'Q3 Planning Team Meeting',
+      attendees: ['John Smith', 'Emily Chen', 'Michael Rodriguez'],
+      location: 'Conference Room B'
     },
     {
-      time: "12:00 PM",
-      title: "Lunch Meeting",
-      attendees: ["Sarah Johnson"],
-      location: "Central Cafe"
+      time: '12:00 PM',
+      title: 'Lunch Meeting',
+      attendees: ['Sarah Johnson'],
+      location: 'Central Cafe'
     },
     {
-      time: "4:00 PM", 
-      title: "Career Development 1:1",
-      attendees: ["Manager - David Wilson"],
-      location: "Office"
+      time: '4:00 PM',
+      title: 'Career Development 1:1',
+      attendees: ['Manager - David Wilson'],
+      location: 'Office'
     }
   ],
   schedule: [
-    "9:00 AM - 10:00 AM: Personal time (Yoga)",
-    "10:30 AM - 11:30 AM: Q3 Planning Meeting",
-    "12:00 PM - 1:00 PM: Lunch with Sarah",
-    "2:00 PM - 3:30 PM: Product roadmap work",
-    "4:00 PM - 4:30 PM: 1:1 with manager",
-    "5:00 PM - 6:00 PM: Code review",
-    "Evening: Family dinner at home"
+    '9:00 AM - 10:00 AM: Personal time (Yoga)',
+    '10:30 AM - 11:30 AM: Q3 Planning Meeting',
+    '12:00 PM - 1:00 PM: Lunch with Sarah',
+    '2:00 PM - 3:30 PM: Product roadmap work',
+    '4:00 PM - 4:30 PM: 1:1 with manager',
+    '5:00 PM - 6:00 PM: Code review',
+    'Evening: Family dinner at home'
   ]
 }
 
 function formatSecureDataResponse(question: string): string {
   const lowerQuestion = question.toLowerCase()
-  
+
   if (lowerQuestion.includes('what did i do') || lowerQuestion.includes('activities')) {
     return `
       <h5>Your Activities on July 5th:</h5>
@@ -98,7 +97,7 @@ export default defineEventHandler(async (event) => {
   try {
     // Check simple verification cookie
     const verified = getCookie(event, 'verified')
-    
+
     if (verified !== 'true') {
       throw createError({
         statusCode: 401,
@@ -117,11 +116,11 @@ export default defineEventHandler(async (event) => {
       data: formattedData,
       timestamp: new Date().toISOString()
     }
-  } catch (error: any) {
-    if (error.statusCode) {
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error
     }
-    
+
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to fetch secure data'

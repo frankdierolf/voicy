@@ -1,9 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  future: {
-    compatibilityVersion: 4
-  },
-
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui-pro',
@@ -25,18 +21,18 @@ export default defineNuxtConfig({
     }
   },
 
-  experimental: {
-    viewTransition: true
-  },
-
-  compatibilityDate: '2024-07-11',
-
   runtimeConfig: {
     openaiApiKey: process.env.OPENAI_API_KEY,
     public: {
       apiBase: '/api'
     }
   },
+
+  experimental: {
+    viewTransition: true
+  },
+
+  compatibilityDate: '2024-07-11',
 
   nitro: {
     experimental: {

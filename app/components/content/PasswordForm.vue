@@ -26,17 +26,17 @@ async function verifyPassword() {
 
     if (response.success) {
       verified.value = true
-      
+
       // Fetch secure data (cookie auth is automatic)
       const dataResponse = await $fetch('/api/secure-data', {
         method: 'GET'
       })
-      
+
       secureData.value = dataResponse.data
     } else {
       error.value = response.message || 'Incorrect password'
     }
-  } catch (err) {
+  } catch {
     error.value = 'Verification failed. Please try again.'
   } finally {
     loading.value = false
@@ -60,28 +60,30 @@ function reset() {
     <div v-if="!verified">
       <div class="flex items-center gap-2 mb-3">
         <UIcon name="i-lucide-lock" class="text-amber-500" />
-        <h3 class="text-lg font-semibold">Password Required</h3>
+        <h3 class="text-lg font-semibold">
+          Password Required
+        </h3>
       </div>
-      
+
       <p class="text-muted mb-4">
         <span v-if="question">To access information about "{{ question }}", please</span>
         <span v-else>To access your secure data, please</span>
         enter your password:
       </p>
 
-      <UForm :state="{ password }" @submit="onSubmit" class="space-y-3">
+      <UForm :state="{ password }" class="space-y-3" @submit="onSubmit">
         <div class="flex gap-2">
-          <UInput 
-            v-model="password" 
-            type="password" 
+          <UInput
+            v-model="password"
+            type="password"
             placeholder="Enter your password"
             :loading="loading"
             :disabled="loading"
             class="flex-1"
             @keydown.enter="onSubmit"
           />
-          <UButton 
-            type="submit" 
+          <UButton
+            type="submit"
             :loading="loading"
             :disabled="!password.trim() || loading"
             color="primary"
@@ -89,7 +91,7 @@ function reset() {
             Verify
           </UButton>
         </div>
-        
+
         <div v-if="error" class="flex items-center gap-2 text-red-500 text-sm">
           <UIcon name="i-lucide-alert-circle" />
           <span>{{ error }}</span>
@@ -100,19 +102,23 @@ function reset() {
     <div v-else class="space-y-3">
       <div class="flex items-center gap-2 text-green-600 dark:text-green-400">
         <UIcon name="i-lucide-check-circle" />
-        <h3 class="text-lg font-semibold">Access Granted</h3>
-      </div>
-      
-      <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-md p-3">
-        <h4 class="font-medium mb-2">Your Secure Data:</h4>
-        <div class="text-sm space-y-1" v-html="secureData"></div>
+        <h3 class="text-lg font-semibold">
+          Access Granted
+        </h3>
       </div>
 
-      <UButton 
-        size="sm" 
-        variant="outline" 
-        @click="reset"
+      <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded-md p-3">
+        <h4 class="font-medium mb-2">
+          Your Secure Data:
+        </h4>
+        <div class="text-sm space-y-1" v-html="secureData" />
+      </div>
+
+      <UButton
+        size="sm"
+        variant="outline"
         class="mt-3"
+        @click="reset"
       >
         Hide Data
       </UButton>
