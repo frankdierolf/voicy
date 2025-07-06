@@ -43,53 +43,30 @@ function formatSecureDataResponse(question: string): string {
   const lowerQuestion = question.toLowerCase()
 
   if (lowerQuestion.includes('what did i do') || lowerQuestion.includes('activities')) {
-    return `
-      <h5>Your Activities on July 5th:</h5>
-      <ul class="list-disc pl-5 space-y-1">
-        ${SECURE_DATA.activities.map(activity => `<li>${activity}</li>`).join('')}
-      </ul>
-    `
+    return `**Your Activities on July 5th:**
+
+${SECURE_DATA.activities.map(activity => `• ${activity}`).join('\n')}`
   } else if (lowerQuestion.includes('who did i meet') || lowerQuestion.includes('meetings')) {
-    return `
-      <h5>People You Met on July 5th:</h5>
-      <div class="space-y-2">
-        ${SECURE_DATA.meetings.map(meeting => `
-          <div class="border-l-2 border-blue-500 pl-3">
-            <strong>${meeting.time}</strong> - ${meeting.title}<br>
-            <span class="text-muted">Attendees: ${meeting.attendees.join(', ')}</span><br>
-            <span class="text-muted">Location: ${meeting.location}</span>
-          </div>
-        `).join('')}
-      </div>
-    `
+    return `**People You Met on July 5th:**
+
+${SECURE_DATA.meetings.map(meeting =>
+  `**${meeting.time}** - ${meeting.title}
+  Attendees: ${meeting.attendees.join(', ')}
+  Location: ${meeting.location}`
+).join('\n\n')}`
   } else if (lowerQuestion.includes('schedule') || lowerQuestion.includes('calendar')) {
-    return `
-      <h5>Your Schedule for July 5th:</h5>
-      <ul class="list-disc pl-5 space-y-1">
-        ${SECURE_DATA.schedule.map(item => `<li>${item}</li>`).join('')}
-      </ul>
-    `
+    return `**Your Schedule for July 5th:**
+
+${SECURE_DATA.schedule.map(item => `• ${item}`).join('\n')}`
   } else {
     // Default response with all data
-    return `
-      <h5>Complete Information for July 5th:</h5>
-      <div class="space-y-4">
-        <div>
-          <h6 class="font-medium">Activities:</h6>
-          <ul class="list-disc pl-5 space-y-1 text-sm">
-            ${SECURE_DATA.activities.slice(0, 3).map(activity => `<li>${activity}</li>`).join('')}
-          </ul>
-        </div>
-        <div>
-          <h6 class="font-medium">Key Meetings:</h6>
-          <div class="text-sm">
-            ${SECURE_DATA.meetings.map(meeting => `
-              <div>• ${meeting.time} - ${meeting.title}</div>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-    `
+    return `**Complete Information for July 5th:**
+
+**Activities:**
+${SECURE_DATA.activities.slice(0, 3).map(activity => `• ${activity}`).join('\n')}
+
+**Key Meetings:**
+${SECURE_DATA.meetings.map(meeting => `• ${meeting.time} - ${meeting.title}`).join('\n')}`
   }
 }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   question?: string
 }>()
 
@@ -29,7 +29,8 @@ async function verifyPassword() {
 
       // Fetch secure data (cookie auth is automatic)
       const dataResponse = await $fetch('/api/secure-data', {
-        method: 'GET'
+        method: 'GET',
+        query: { question: props.question || '' }
       })
 
       secureData.value = dataResponse.data
@@ -111,7 +112,9 @@ function reset() {
         <h4 class="font-medium mb-2">
           Your Secure Data:
         </h4>
-        <div class="text-sm space-y-1" v-html="secureData" />
+        <div class="text-sm space-y-1 whitespace-pre-line">
+          {{ secureData }}
+        </div>
       </div>
 
       <UButton
