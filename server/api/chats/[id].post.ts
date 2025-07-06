@@ -84,10 +84,12 @@ export default defineEventHandler(async (event) => {
       || userQuestion.includes('what was my schedule')
 
   if (isSecureDataQuestion) {
-    // Return pre-built response with password form
+    // Return pre-built response with special marker for password form
     const secureResponse = `I can help you access your secure data for July 5th. Please verify your identity first:
 
-<PasswordForm question="${lastMessage.content}" />
+**[SECURE_DATA_REQUEST]**
+Question: ${lastMessage.content}
+**[/SECURE_DATA_REQUEST]**
 
 Once you enter the correct password ("iamharald"), I'll show you your confidential information for that day.`
 

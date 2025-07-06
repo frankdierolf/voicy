@@ -61,6 +61,28 @@ function copy(e: MouseEvent, message: Message) {
   }, 2000)
 }
 
+// Helper functions for secure data request detection
+function hasSecureDataRequest(content: string): boolean {
+  return content.includes('**[SECURE_DATA_REQUEST]**')
+}
+
+function getContentBeforeSecureRequest(content: string): string {
+  const parts = content.split('**[SECURE_DATA_REQUEST]**')
+  const beforeMatch = parts[0]
+  return beforeMatch ? beforeMatch.trim() : ''
+}
+
+function getContentAfterSecureRequest(content: string): string {
+  const parts = content.split('**[/SECURE_DATA_REQUEST]**')
+  const afterMatch = parts[1]
+  return afterMatch ? afterMatch.trim() : ''
+}
+
+function getSecureDataQuestion(content: string): string {
+  const match = content.match(/\*\*\[SECURE_DATA_REQUEST\]\*\*\s*Question:\s*(.+?)\s*\*\*\[\/SECURE_DATA_REQUEST\]\*\*/)
+  return match && match[1] ? match[1].trim() : ''
+}
+
 onMounted(() => {
   if (chat.value?.messages.length === 1) {
     reload()
@@ -84,7 +106,31 @@ onMounted(() => {
           :spacing-offset="160"
         >
           <template #content="{ message }">
+            <div v-if="hasSecureDataRequest(message.content)">
+              <!-- Render content before secure request -->
+              <MDCCached
+                :value="getContentBeforeSecureRequest(message.content)"
+                :cache-key="message.id + '-before'"
+                unwrap="p"
+                :components="components"
+                :parser-options="{ highlight: false }"
+              />
+
+              <!-- Render password form -->
+              <PasswordForm :question="getSecureDataQuestion(message.content)" />
+
+              <!-- Render content after secure request -->
+              <MDCCached
+                :value="getContentAfterSecureRequest(message.content)"
+                :cache-key="message.id + '-after'"
+                unwrap="p"
+                :components="components"
+                :parser-options="{ highlight: false }"
+              />
+            </div>
+
             <MDCCached
+              v-else
               :value="message.content"
               :cache-key="message.id"
               unwrap="p"
