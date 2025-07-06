@@ -100,12 +100,24 @@ Once you enter the correct password ("iamharald"), I'll show you your confidenti
       content: secureResponse
     })
 
-    // Return the pre-built response as a stream
-    return new Response(secureResponse, {
-      headers: {
-        'Content-Type': 'text/plain'
+    // Return the pre-built response using streamText to ensure proper format
+    return streamText({
+      model: openai('gpt-3.5-turbo'),
+      messages: [
+        {
+          role: 'system',
+          content: `You must respond exactly with this message: "${secureResponse}"`
+        },
+        {
+          role: 'user',
+          content: lastMessage.content
+        }
+      ],
+      maxTokens: 1000,
+      async onFinish() {
+        // Response already stored above
       }
-    })
+    }).toDataStreamResponse()
   }
 
   // Clean messages to ensure OpenAI compatibility (remove parts array if present)
