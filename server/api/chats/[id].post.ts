@@ -87,11 +87,7 @@ export default defineEventHandler(async (event) => {
     // Return pre-built response with password form
     const secureResponse = `I can help you access your secure data for July 5th. Please verify your identity first:
 
-::password-form
----
-question: "${lastMessage.content}"
----
-::
+<PasswordForm question="${lastMessage.content}" />
 
 Once you enter the correct password ("iamharald"), I'll show you your confidential information for that day.`
 

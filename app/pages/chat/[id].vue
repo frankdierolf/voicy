@@ -6,8 +6,8 @@ import ProseStreamPre from '../../components/prose/PreStream.vue'
 import PasswordForm from '../../components/content/PasswordForm.vue'
 
 const components = {
-  'pre': ProseStreamPre as unknown as DefineComponent,
-  'password-form': PasswordForm as unknown as DefineComponent
+  pre: ProseStreamPre as unknown as DefineComponent,
+  PasswordForm: PasswordForm as unknown as DefineComponent
 }
 
 const route = useRoute()
