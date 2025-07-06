@@ -111,10 +111,13 @@ Once you enter the correct password ("iamharald"), I'll show you your confidenti
   }
 
   // Clean messages to ensure OpenAI compatibility (remove parts array if present)
+  console.log('Original messages:', JSON.stringify(messages, null, 2))
   const cleanedMessages = messages.map((message: any) => ({
     role: message.role,
     content: message.content
   }))
+  console.log('Cleaned messages:', JSON.stringify(cleanedMessages, null, 2))
+  console.log('Using model:', model)
 
   return streamText({
     model: openai(model || 'gpt-4o'),
