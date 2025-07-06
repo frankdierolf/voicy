@@ -112,7 +112,7 @@ Once you enter the correct password ("iamharald"), I'll show you your confidenti
 
   // Clean messages to ensure OpenAI compatibility (remove parts array if present)
   console.log('Original messages:', JSON.stringify(messages, null, 2))
-  const cleanedMessages = messages.map((message: any) => ({
+  const cleanedMessages = messages.map((message: { role: string, content: string }) => ({
     role: message.role,
     content: message.content
   }))

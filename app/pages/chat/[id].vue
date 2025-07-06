@@ -3,9 +3,11 @@ import type { DefineComponent } from 'vue'
 import { useChat, type Message } from '@ai-sdk/vue'
 import { useClipboard } from '@vueuse/core'
 import ProseStreamPre from '../../components/prose/PreStream.vue'
+import PasswordForm from '../../components/content/PasswordForm.vue'
 
 const components = {
-  pre: ProseStreamPre as unknown as DefineComponent
+  'pre': ProseStreamPre as unknown as DefineComponent,
+  'password-form': PasswordForm as unknown as DefineComponent
 }
 
 const route = useRoute()
