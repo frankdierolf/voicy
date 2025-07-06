@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   const { id } = getRouterParams(event)
   // TODO: Use readValidatedBody
-  const { messages } = await readBody(event)
+  const { model, messages } = await readBody(event)
 
   const db = useDrizzle()
 
@@ -111,7 +111,7 @@ Once you enter the correct password ("iamharald"), I'll show you your confidenti
   }
 
   return streamText({
-    model: openai('gpt-4o'),
+    model: openai(model || 'gpt-4o'),
     maxTokens: 4000,
     system: 'You are Voicy, a helpful assistant for secure voice-based data access. You help users access their personal information after proper authentication.',
     messages,
