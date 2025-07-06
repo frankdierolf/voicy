@@ -110,11 +110,17 @@ Once you enter the correct password ("iamharald"), I'll show you your confidenti
     })
   }
 
+  // Clean messages to ensure OpenAI compatibility (remove parts array if present)
+  const cleanedMessages = messages.map((message: any) => ({
+    role: message.role,
+    content: message.content
+  }))
+
   return streamText({
     model: openai(model || 'gpt-4o'),
     maxTokens: 4000,
     system: 'You are Voicy, a helpful assistant for secure voice-based data access. You help users access their personal information after proper authentication.',
-    messages,
+    messages: cleanedMessages,
     async onFinish(response) {
       await db.insert(tables.messages).values({
         chatId: chat.id,
