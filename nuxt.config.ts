@@ -31,6 +31,13 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2024-07-11',
 
+  runtimeConfig: {
+    openaiApiKey: process.env.OPENAI_API_KEY,
+    public: {
+      apiBase: '/api'
+    }
+  },
+
   nitro: {
     experimental: {
       openAPI: true

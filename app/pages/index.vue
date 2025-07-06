@@ -22,24 +22,16 @@ function onSubmit() {
 
 const quickChats = [
   {
-    label: 'Why use Nuxt UI Pro?',
-    icon: 'i-logos-nuxt-icon'
+    label: 'What did I do on July 5?',
+    icon: 'i-lucide-calendar'
   },
   {
-    label: 'Help me create a Vue composable',
-    icon: 'i-logos-vue'
+    label: 'Who did I meet on July 5?',
+    icon: 'i-lucide-users'
   },
   {
-    label: 'Tell me more about UnJS',
-    icon: 'i-logos-unjs'
-  },
-  {
-    label: 'Why should I consider VueUse?',
-    icon: 'i-logos-vueuse'
-  },
-  {
-    label: 'Tailwind CSS best practices',
-    icon: 'i-logos-tailwindcss-icon'
+    label: 'What was my schedule on July 5?',
+    icon: 'i-lucide-clock'
   }
 ]
 </script>
@@ -52,9 +44,14 @@ const quickChats = [
 
     <template #body>
       <UContainer class="flex-1 flex flex-col justify-center gap-4 sm:gap-6 py-8">
-        <h1 class="text-3xl sm:text-4xl text-highlighted font-bold">
-          How can I help you today?
-        </h1>
+        <div class="text-center">
+          <h1 class="text-3xl sm:text-4xl text-highlighted font-bold mb-4">
+            Voicy - Secure Voice-Based Data Access
+          </h1>
+          <p class="text-lg text-muted mb-6">
+            Ask questions about your secure data. Password verification required for access.
+          </p>
+        </div>
 
         <UChatPrompt
           v-model="input"

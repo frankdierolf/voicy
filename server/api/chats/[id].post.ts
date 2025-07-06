@@ -1,5 +1,6 @@
 import { streamText } from 'ai'
-import { createWorkersAI } from 'workers-ai-provider'
+import { createOpenAI } from '@ai-sdk/openai'
+import { tables, and, eq } from '../../utils/drizzle'
 
 defineRouteMeta({
   openAPI: {
@@ -16,14 +17,11 @@ export default defineEventHandler(async (event) => {
   const { model, messages } = await readBody(event)
 
   const db = useDrizzle()
-  // Enable AI Gateway if defined in environment variables
-  const gateway = process.env.CLOUDFLARE_AI_GATEWAY_ID
-    ? {
-        id: process.env.CLOUDFLARE_AI_GATEWAY_ID,
-        cacheTtl: 60 * 60 * 24 // 24 hours
-      }
-    : undefined
-  const workersAI = createWorkersAI({ binding: hubAI(), gateway })
+  
+  // Initialize OpenAI client
+  const openai = createOpenAI({
+    apiKey: useRuntimeConfig().openaiApiKey
+  })
 
   const chat = await db.query.chats.findFirst({
     where: (chat, { eq }) => and(eq(chat.id, id as string), eq(chat.userId, session.user?.id || session.id)),
@@ -36,26 +34,36 @@ export default defineEventHandler(async (event) => {
   }
 
   if (!chat.title) {
-    // @ts-expect-error - response is not typed
-    const { response: title } = await hubAI().run('@cf/meta/llama-3.1-8b-instruct-fast', {
-      stream: false,
-      messages: [{
-        role: 'system',
-        content: `You are a title generator for a chat:
-        - Generate a short title based on the first user's message
-        - The title should be less than 30 characters long
-        - The title should be a summary of the user's message
-        - Do not use quotes (' or ") or colons (:) or any other punctuation
-        - Do not use markdown, just plain text`
-      }, {
-        role: 'user',
-        content: chat.messages[0]!.content
-      }]
-    }, {
-      gateway
-    })
-    setHeader(event, 'X-Chat-Title', title.replace(/:/g, '').split('\n')[0])
-    await db.update(tables.chats).set({ title }).where(eq(tables.chats.id, id as string))
+    try {
+      const titleResponse = await streamText({
+        model: openai('gpt-3.5-turbo'),
+        messages: [{
+          role: 'system',
+          content: `You are a title generator for a chat:
+          - Generate a short title based on the first user's message
+          - The title should be less than 30 characters long
+          - The title should be a summary of the user's message
+          - Do not use quotes (' or ") or colons (:) or any other punctuation
+          - Do not use markdown, just plain text`
+        }, {
+          role: 'user',
+          content: chat.messages[0]?.content || 'Untitled chat'
+        }],
+        maxTokens: 50
+      })
+      
+      let title = ''
+      for await (const delta of titleResponse.textStream) {
+        title += delta
+      }
+      
+      title = title.replace(/:/g, '').split('\n')[0]?.trim() || 'Untitled'
+      setHeader(event, 'X-Chat-Title', title)
+      await db.update(tables.chats).set({ title }).where(eq(tables.chats.id, id as string))
+    } catch (error) {
+      console.error('Failed to generate title:', error)
+      // Continue without title if generation fails
+    }
   }
 
   const lastMessage = messages[messages.length - 1]
@@ -67,10 +75,45 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Check if the user is asking about secure data (July 5th questions)
+  const userQuestion = lastMessage.content.toLowerCase()
+  const isSecureDataQuestion = 
+    userQuestion.includes('july 5') ||
+    userQuestion.includes('what did i do') ||
+    userQuestion.includes('who did i meet') ||
+    userQuestion.includes('what was my schedule')
+
+  if (isSecureDataQuestion) {
+    // Return pre-built response with password form
+    const secureResponse = `I can help you access your secure data for July 5th. Please verify your identity first:
+
+::password-form
+---
+question: "${lastMessage.content}"
+---
+::
+
+Once you enter the correct password ("iamharald"), I'll show you your confidential information for that day.`
+
+    // Store the response in the database
+    await db.insert(tables.messages).values({
+      chatId: chat.id,
+      role: 'assistant',
+      content: secureResponse
+    })
+
+    // Return the pre-built response as a stream
+    return new Response(secureResponse, {
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+    })
+  }
+
   return streamText({
-    model: workersAI(model),
-    maxTokens: 10000,
-    system: 'You are a helpful assistant that can answer questions and help.',
+    model: openai('gpt-4o'),
+    maxTokens: 4000,
+    system: 'You are Voicy, a helpful assistant for secure voice-based data access. You help users access their personal information after proper authentication.',
     messages,
     async onFinish(response) {
       await db.insert(tables.messages).values({
